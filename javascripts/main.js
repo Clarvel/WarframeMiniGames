@@ -101,8 +101,6 @@ function GrineerHacker(){
 	}
 
 	this.waitID = loadImgs(this.imgs); // load images
-	this.timer = new Date();
-
 
 	this.reset = function(){
 		//console.log("Resetting");
@@ -118,7 +116,7 @@ function GrineerHacker(){
 		this.stats = {
 			won : false,
 			clicks : 0,
-			time : 0,
+			timer : 0,
 		}
 	}
 
@@ -156,7 +154,7 @@ function GrineerHacker(){
 				2 * this.spacing.margin + this.imgs.file[this.imgs.names.indexOf("wheel")].height];
 		resize(this.dim[0], this.dim[1]);
 
-		this.stats.timer = this.timer.getTime();
+		this.stats.timer = new Date().getTime();
 		//this.drawFrame(ctx);
 		if(this.renderer == undefined){
 			console.log("starting game instance");
@@ -182,6 +180,12 @@ function GrineerHacker(){
 		ctx.clearRect(0, 0, this.dim[0], this.dim[1]); // clear enough canvas for game
 		ctx.fillStyle = "black";
 		ctx.fillRect(0, 0, this.dim[0], this.dim[1]); // background
+		ctx.fillStyle = "white";
+		ctx.font = "12px Optima";
+		ctx.fillText("Time: " + (new Date().getTime() - this.stats.timer)/1000, 10, 18);
+		ctx.fillText("Lock Flips: " + this.stats.clicks, 10, 30);
+		ctx.fillText("Speed: " + this.speed, 10, 42);
+
 		var offset; // wedge offset var
 		var img; // current img var
 
@@ -192,6 +196,7 @@ function GrineerHacker(){
 
 		// translate to center
 		ctx.translate(this.dim[0]/2, this.dim[1]/2);
+		ctx.fillText("SPACE", -17, 5);
 
 			// draw time indicator here
 			ctx.rotate(rad(this.timerPos));
@@ -215,6 +220,7 @@ function GrineerHacker(){
 							if(!this.constRot){
 								this.speed = -this.speed;
 							}
+							this.stats.clicks++;
 						}
 					}
 					ctx.drawImage(img, offset, -img.height/2);
@@ -238,20 +244,21 @@ function GrineerHacker(){
 			console.log("game ended");
 			clearInterval(this.renderer);
 			this.renderer = undefined;
-			this.stats.timer = this.timer.getTime() - this.stats.timer;
-			console.log("time elapsed: " + this.stats.timer);
+			var endTime = new Date().getTime();
+			this.stats.timer = (endTime - this.stats.timer)/1000;
+			console.log("\ttime elapsed: " + this.stats.timer + " seconds");
+			console.log("\tclicks: " + this.stats.clicks);
+			console.log("\tspeed: " + this.speed);
 			this.stats.won = true;
-			if(this.wedges.length > 4){
+			if(this.numWedges > 2){
 				this.speed = this.speed+1;
-				if(this.wedges.length >= 8){
+				if(this.numWedges >= 5){
 					this.constRot = false;
 				}
 			}
-			console.log(this.speed);
-			this.StartGame(ctx, this.wedges.length + 1, this.speed, this.constRot);
+			this.StartGame(ctx, this.numWedges+1, this.speed, this.constRot);
 		}
 		this.spacePressed = false;
-		console.log("frame drawn");
 	}
 
 	this.setWedges = function(numWedges){
@@ -268,6 +275,7 @@ function GrineerHacker(){
 		}else if(numWedges > this.MAX_WEDGES){
 			numWedges = this.MAX_WEDGES;
 		}
+		this.numWedges = numWedges;
 		//console.log("making " + numWedges + " wedges");
 		var pos = [this.MAX_WEDGES]; // setup array of available positions to possibly be filled
 		for(var b = 0; b < this.MAX_WEDGES; b++){
