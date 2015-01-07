@@ -182,7 +182,7 @@ function GrineerHacker(){
 		ctx.fillRect(0, 0, this.dim[0], this.dim[1]); // background
 		ctx.fillStyle = "white";
 		ctx.font = "12px Optima";
-		ctx.fillText("Time: " + (new Date().getTime() - this.stats.timer)/1000, 10, 18);
+		ctx.fillText("Time: " + (new Date().getTime() - this.stats.timer)/1000 + " s", 10, 18);
 		ctx.fillText("Lock Flips: " + this.stats.clicks, 10, 30);
 		ctx.fillText("Speed: " + this.speed, 10, 42);
 
@@ -251,7 +251,7 @@ function GrineerHacker(){
 			console.log("\tspeed: " + this.speed);
 			this.stats.won = true;
 			if(this.numWedges > 2){
-				this.speed = this.speed+1;
+				this.speed = Math.abs(this.speed)+1;
 				if(this.numWedges >= 5){
 					this.constRot = false;
 				}
